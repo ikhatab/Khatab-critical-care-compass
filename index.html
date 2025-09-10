@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Resources: ARDS & Sepsis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 76px; /* Account for fixed navbar */
+        }
+        
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-color);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--secondary-color);
+            font-weight: 600;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        /* ARDS-specific styles */
+        .ards-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .ards-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .ards-section h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ards-card {
+            border-left: 4px solid var(--secondary-color);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        /* Sepsis-specific styles */
+        .sepsis-hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%233498db"/></svg>');
+            background-size: cover;
+            color: white;
+            padding: 5rem 0;
+        }
+        
+        .sepsis-section {
+            padding: 4rem 0;
+        }
+        
+        .sepsis-section-title {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .sepsis-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+        
+        .sepsis-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        /* Hide all tab content by default */
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-3px);
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Medical Resources</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ards-tab" data-bs-toggle="tab">ARDS</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#sepsis-tab" data-bs-toggle="tab">Sepsis</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="container">
+            <h1 class="display-4">Medical Educational Resources</h1>
+            <p class="lead">Comprehensive clinical resources for healthcare professionals</p>
+            <p><em>Created by Dr. Islam Khatab for Educational Purpose</em></p>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <div class="container mt-4">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="ards-tab" data-bs-toggle="tab" data-bs-target="#ards" type="button" role="tab">ARDS Resource</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sepsis-tab" data-bs-toggle="tab" data-bs-target="#sepsis" type="button" role="tab">Sepsis Resource</button>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="myTabContent">
+        <!-- ARDS Content -->
+        <div class="tab-pane fade show active" id="ards" role="tabpanel">
+            <!-- ARDS content will be loaded here -->
+        </div>
+
+        <!-- Sepsis Content -->
+        <div class="tab-pane fade" id="sepsis" role="tabpanel">
+            <!-- Sepsis content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2023 Medical Resources | For Healthcare Professionals</p>
+            <p>These resources are intended for educational purposes only. Always follow your institution's protocols and consult current guidelines when treating patients.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to load content from external files
+        async function loadContent() {
+            try {
+                // Load ARDS content
+                const ardsResponse = await fetch('ARDS.html');
+                const ardsHtml = await ardsResponse.text();
+                
+                // Extract the body content from ARDS HTML
+                const ardsDoc = new DOMParser().parseFromString(ardsHtml, 'text/html');
+                const ardsContent = ardsDoc.querySelector('main').innerHTML;
+                
+                // Insert into the ARDS tab
+                document.getElementById('ards').innerHTML = ardsContent;
+                
+                // Load Sepsis content
+                const sepsisResponse = await fetch('index.html');
+                const sepsisHtml = await sepsisResponse.text();
+                
+                // Extract the body content from Sepsis HTML
+                const sepsisDoc = new DOMParser().parseFromString(sepsisHtml, 'text/html');
+                
+                // Get the main content (skip the navigation)
+                const sepsisSections = sepsisDoc.querySelectorAll('section');
+                let sepsisContent = '';
+                
+                sepsisSections.forEach(section => {
+                    sepsisContent += section.outerHTML;
+                });
+                
+                // Insert into the Sepsis tab
+                document.getElementById('sepsis').innerHTML = sepsisContent;
+                
+                // Reinitialize any scripts or event listeners
+                initializeScripts();
+                
+            } catch (error) {
+                console.error('Error loading content:', error);
+                document.getElementById('ards').innerHTML = '<div class="container"><div class="alert alert-danger">Error loading ARDS content. Please make sure ARDS.html is available.</div></div>';
+                document.getElementById('sepsis').innerHTML = '<div class="container"><div class="alert alert-danger">Error loading Sepsis content. Please make sure index.html is available.</div></div>';
+            }
+        }
+        
+        // Function to reinitialize scripts after content is loaded
+        function initializeScripts() {
+            // Reinitialize charts, event listeners, etc.
+            // This would need to be customized based on the specific functionality of each resource
+            
+            // Back to top button functionality
+            const backToTopButton = document.querySelector('.back-to-top');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.style.display = 'flex';
+                } else {
+                    backToTopButton.style.display = 'none';
+                }
+            });
+            
+            backToTopButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const offsetTop = targetElement.offsetTop - 70; // Adjust for fixed navbar
+                        
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Initialize any other scripts that were in the original files
+            // This would need to be customized based on the specific functionality
+        }
+        
+        // Load content when the page is ready
+        document.addEventListener('DOMContentLoaded', loadContent);
+    </script>
+</body>
+</html>
